@@ -25,7 +25,7 @@ const NoteForm = ({ onNoteCreated }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4">
+    <form onSubmit={handleSubmit}  className=" shadow-md rounded-lg p-4 sm:p-5 md:p-6 mb-6 animate-fade space-y-4  animate-delay-100 animate-duration-500">
       <div className="mb-2">
         <input
           type="text"

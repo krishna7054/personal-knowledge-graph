@@ -1,38 +1,222 @@
-.App {
-  text-align: center;
-}
+/* Custom styles for the Personal Knowledge Graph app */
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
+/* Animations */
+@keyframes fadeIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s ease-out;
+}
+
+/* Container and layout */
+.container {
+  max-width: 100%;
+  padding: 1rem;
+  
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+/* NoteForm styles */
+.note-form {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.note-form input,
+.note-form textarea {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+
+.note-form input:focus,
+.note-form textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.note-form button {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.note-form button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* NoteList styles */
+.note-list {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.note-list-item {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.note-list-item:hover {
+  background: #f1f5f9;
+  transform: translateX(5px);
+}
+
+.note-list-item:last-child {
+  border-bottom: none;
+}
+
+/* NoteView styles */
+.note-view {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.note-view input {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+
+.note-view input:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.note-view button {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.note-view button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.note-view .suggestions {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  background: white;
+  max-height: 10rem;
+  overflow-y: auto;
+}
+
+/* GraphView styles */
+.graph-view {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  height: 400px; /* Default height */
+}
+
+.graph-view canvas,
+.graph-view .cytoscape-container {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0.25rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 639px) {
+  .note-form,
+  .note-list,
+  .note-view,
+  .graph-view {
+    padding: 1rem;
+  }
+
+  .graph-view {
+    height: 300px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .graph-view {
+    height: 350px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .graph-view {
+    height: 400px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .graph-view {
+    height: 500px;
   }
 }
