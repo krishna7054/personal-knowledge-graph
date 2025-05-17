@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env
+env/
+.venv/
+
+# SQLite database
+knowledge.db
+*.db
+*.sqlite3
+
+# Alembic migrations (optional: include if you regenerate migrations)
+# alembic/versions/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Dependency lock files (if using Poetry or Pipenv, adjust as needed)
+poetry.lock
+Pipfile.lock
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Testing and coverage
+.coverage
+coverage.xml
+*.cover
+.pytest_cache/
+htmlcov/
+
+# Miscellaneous
+*.bak
+*.swp
+*~
+*.tmp
