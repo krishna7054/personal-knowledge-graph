@@ -1,63 +1,7 @@
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-
-// const NoteView = ({ noteId, onLinkCreated }) => {
-//   const [note, setNote] = useState(null);
-//   const [linkId, setLinkId] = useState('');
-
-//   useEffect(() => {
-//     const fetchNote = async () => {
-//       try {
-//         const response = await axios.get(`https://personal-knowledge-graph-production.up.railway.app/notes/${noteId}`);
-//         setNote(response.data);
-//       } catch (error) {
-//         console.error('Error fetching note:', error);
-//       }
-//     };
-//     fetchNote();
-//   }, [noteId]);
-
-//   const handleLink = async () => {
-//     try {
-//       await axios.patch(`https://personal-knowledge-graph-production.up.railway.app/notes/${noteId}/link`, { target_id: parseInt(linkId) });
-//       setLinkId('');
-//       onLinkCreated();
-//     } catch (error) {
-//       console.error('Error creating link:', error);
-//     }
-//   };
-
-//   if (!note) return <div>Loading...</div>;
-
-//   return (
-//     <div className="border p-4 mb-4">
-//       <h2 className="text-xl font-bold">{note.title}</h2>
-//       <p>{note.content}</p>
-//       <p><strong>Tags:</strong> {note.tags.map(tag => tag.name).join(', ')}</p>
-//       <p><strong>Links:</strong> {note.links.join(', ')}</p>
-//       <p><strong>Backlinks:</strong> {note.backlinks.join(', ')}</p>
-//       <div className="mt-2">
-//         <input
-//           type="number"
-//           value={linkId}
-//           onChange={(e) => setLinkId(e.target.value)}
-//           placeholder="Link to Note ID"
-//           className="border p-2 mr-2"
-//         />
-//         <button onClick={handleLink} className="bg-blue-500 text-white p-2">Add Link</button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default NoteView;
-
-
-
-
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { Loader2, LinkIcon, ArrowLeftRight, Tag } from "lucide-react"
+import Markdown from 'react-markdown';
 
 export default function NoteView({ noteId, onLinkCreated }) {
   const [note, setNote] = useState(null)
@@ -128,10 +72,11 @@ export default function NoteView({ noteId, onLinkCreated }) {
   return (
     <div className="p-12  ">
       <h1 className="text-3xl flex justify-center text-orange-700">Note Details</h1>
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">{note.title}</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-4"><span className="text-cyan-700">Title: </span>{note.title}</h2>
 
       <div className="mb-6 text-gray-800 whitespace-pre-wrap">
-        {note.content ? note.content : <em className="text-gray-400">No content</em>}
+        <span className="text-cyan-700">Content: </span>
+        {note.content ? <Markdown>{note.content}</Markdown>: <em className="text-gray-400">No content</em>}
       </div>
 
       {note.tags && note.tags.length > 0 && (

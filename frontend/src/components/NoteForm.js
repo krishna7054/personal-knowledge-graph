@@ -1,80 +1,3 @@
-// import React, { useState } from 'react';
-// import axios from 'axios';
-
-// const NoteForm = ({ onNoteCreated }) => {
-//   const [title, setTitle] = useState('');
-//   const [content, setContent] = useState('');
-//   const [tags, setTags] = useState('');
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       await axios.post('http://localhost:8000/notes/', {
-//         title,
-//         content,
-//         tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-//       });
-//       setTitle('');
-//       setContent('');
-//       setTags('');
-//       onNoteCreated();
-//     } catch (error) {
-//       console.error('Error creating note:', error);
-//       alert('Failed to create note: ' + (error.response?.data?.detail || 'Unknown error'));
-//     }
-//   };
-
-//   return (
-//     <form
-//       onSubmit={handleSubmit}
-//       className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-4 sm:p-6 md:p-8 mb-8 space-y-4 transition-all duration-500 ease-in-out animate-fade-in"
-//     >
-//       <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">Create a New Note</h2>
-
-//       <div>
-//         <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-//         <input
-//           type="text"
-//           value={title}
-//           onChange={(e) => setTitle(e.target.value)}
-//           placeholder="Note Title"
-//           className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-//           required
-//         />
-//       </div>
-
-//       <div>
-//         <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-//         <textarea
-//           value={content}
-//           onChange={(e) => setContent(e.target.value)}
-//           placeholder="Note Content (Markdown supported)"
-//           className="border border-gray-300 rounded-md p-2 w-full h-36 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
-//         />
-//       </div>
-
-//       <div>
-//         <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
-//         <input
-//           type="text"
-//           value={tags}
-//           onChange={(e) => setTags(e.target.value)}
-//           placeholder="Tags (e.g., productivity, research)"
-//           className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-//         />
-//       </div>
-
-//       <button
-//         type="submit"
-//         className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300"
-//       >
-//         Create Note
-//       </button>
-//     </form>
-//   );
-// };
-
-// export default NoteForm;
 
 
 import { useState } from "react"
@@ -160,7 +83,7 @@ export default function NoteForm({ onNoteCreated }) {
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Note Content (Markdown supported)"
+            placeholder="Note Content (Markdown supported, e.g., [[Note Title]] for links, # Heading, **bold**)"
             className="w-full border rounded-md px-3 py-2 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

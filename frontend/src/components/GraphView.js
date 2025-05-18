@@ -1,159 +1,4 @@
-// import React, { useState, useEffect, useRef } from 'react';
-// import axios from 'axios';
-// import CytoscapeComponent from 'react-cytoscapejs';
-// import './GraphView.css';
-
-// const GraphView = ({ refresh }) => {
-//   const [graph, setGraph] = useState({ adjacency_list: {} });
-//   const [showVisual, setShowVisual] = useState(false);
-//   const cyRef = useRef(null);
-
-//   useEffect(() => {
-//     const fetchGraph = async () => {
-//       try {
-//         const response = await axios.get('https://personal-knowledge-graph-production.up.railway.app/notes/graph/');
-//         console.log('Graph data:', response.data);
-//         setGraph(response.data);
-//       } catch (error) {
-//         console.error('Error fetching graph:', error);
-//       }
-//     };
-//     fetchGraph();
-//   }, [refresh]);
-
-//   // Convert adjacency list to Cytoscape elements with validation
-//   const elements = (() => {
-//     if (!graph.adjacency_list || typeof graph.adjacency_list !== 'object') {
-//       console.warn('Invalid adjacency_list:', graph.adjacency_list);
-//       return [];
-//     }
-
-//     const seenNodes = new Set();
-//     const elementsArray = Object.entries(graph.adjacency_list).flatMap(([source, targets]) => {
-//       const nodeElements = [];
-//       // Add source node if not already added
-//       if (!seenNodes.has(source)) {
-//         nodeElements.push({ data: { id: source, label: source } });
-//         seenNodes.add(source);
-//       }
-//       // Add target nodes and edges
-//       const edgeElements = (Array.isArray(targets) ? targets : []).map(target => {
-//         if (!seenNodes.has(target)) {
-//           nodeElements.push({ data: { id: target, label: target } });
-//           seenNodes.add(target);
-//         }
-//         return {
-//           data: { source, target, id: `${source}-${target}` }
-//         };
-//       });
-//       return [...nodeElements, ...edgeElements];
-//     });
-
-//     // Remove duplicates (in case of malformed data)
-//     const uniqueElements = [];
-//     const elementIds = new Set();
-//     for (const element of elementsArray) {
-//       const id = element.data.id;
-//       if (!elementIds.has(id)) {
-//         uniqueElements.push(element);
-//         elementIds.add(id);
-//       }
-//     }
-
-//     console.log('Cytoscape elements:', uniqueElements);
-//     return uniqueElements;
-//   })();
-
-//   // Cytoscape layout configuration
-//   const layout = {
-//     name: elements.length > 0 ? 'cose' : 'grid',
-//     idealEdgeLength: 100,
-//     nodeOverlap: 20,
-//     refresh: 20,
-//     fit: true,
-//     padding: 30,
-//     randomize: false,
-//     componentSpacing: 100,
-//     nodeRepulsion: 400000,
-//     edgeElasticity: 100,
-//     nestingFactor: 5,
-//     gravity: 80,
-//     numIter: 1000,
-//     initialTemp: 200,
-//     coolingFactor: 0.95,
-//     minTemp: 1.0
-//   };
-
-//   return (
-//     <div className="graph-view">
-//       <div className="flex justify-between items-center mb-2">
-//         <h2 className="text-xl font-bold">Graph View</h2>
-//         <button
-//           onClick={() => setShowVisual(!showVisual)}
-//           className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300"
-//         >
-//           {showVisual ? 'Show Text View' : 'Show Visual Graph'}
-//         </button>
-//       </div>
-//       {showVisual ? (
-//         elements.length > 0 ? (
-//           <CytoscapeComponent
-//             elements={elements}
-//             style={{ width: '100%', height: '400px' }}
-//             layout={layout}
-//             stylesheet={[
-//               {
-//                 selector: 'node',
-//                 style: {
-//                   'background-color': '#0074D9',
-//                   'label': 'data(label)',
-//                   'color': '#fff',
-//                   'text-valign': 'center',
-//                   'text-halign': 'center',
-//                   'font-size': '12px'
-//                 }
-//               },
-//               {
-//                 selector: 'edge',
-//                 style: {
-//                   'width': 2,
-//                   'line-color': '#ccc',
-//                   'target-arrow-color': '#ccc',
-//                   'target-arrow-shape': 'triangle',
-//                   'curve-style': 'bezier'
-//                 }
-//               }
-//             ]}
-//             cy={(cy) => {
-//               cyRef.current = cy;
-//               console.log('Cytoscape instance initialized:', cy);
-//             }}
-//           />
-//         ) : (
-//           <div className="text-gray-500">No graph data available</div>
-//         )
-//       ) : (
-//         <ul className="graph-list">
-//           {Object.entries(graph.adjacency_list).length > 0 ? (
-//             Object.entries(graph.adjacency_list).map(([title, links]) => (
-//               <li key={title} className="graph-item">
-//                 <strong>{title}</strong> → {links.length > 0 ? links.join(', ') : 'None'}
-//               </li>
-//             ))
-//           ) : (
-//             <li className="text-gray-500">No graph data available</li>
-//           )}
-//         </ul>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default GraphView;
-
-
-
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import axios from "axios"
 import CytoscapeComponent from "react-cytoscapejs"
 import { Loader2 } from "lucide-react"
@@ -161,25 +6,55 @@ import { Loader2 } from "lucide-react"
 export default function GraphView({ refresh, viewType }) {
   const [graph, setGraph] = useState({ adjacency_list: {} })
   const [loading, setLoading] = useState(true)
+  const [, setCyReady] = useState(false)
+  const [forceUpdate, setForceUpdate] = useState(0)
   const cyRef = useRef(null)
+  const mountedRef = useRef(true)
+
+  // Track component mounting state
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
+  // Safely destroy Cytoscape instance on unmount
+  useEffect(() => {
+    return () => {
+      if (cyRef.current) {
+        try {
+          cyRef.current.destroy()
+        } catch (e) {
+          console.error("Error destroying Cytoscape instance:", e)
+        }
+        cyRef.current = null
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const fetchGraph = async () => {
+      if (!mountedRef.current) return
       setLoading(true)
       try {
         const response = await axios.get("https://personal-knowledge-graph-production.up.railway.app/notes/graph/")
-        setGraph(response.data)
+        if (mountedRef.current) {
+          setGraph(response.data || { adjacency_list: {} })
+        }
       } catch (error) {
         console.error("Error fetching graph:", error)
       } finally {
-        setLoading(false)
+        if (mountedRef.current) {
+          setLoading(false)
+        }
       }
     }
 
     fetchGraph()
   }, [refresh])
 
-  const elements = (() => {
+  const elements = useMemo(() => {
     if (!graph.adjacency_list || typeof graph.adjacency_list !== "object") {
       return []
     }
@@ -217,6 +92,7 @@ export default function GraphView({ refresh, viewType }) {
       return [...nodeElements, ...edgeElements]
     })
 
+    // Deduplicate elements
     const uniqueElements = []
     const elementIds = new Set()
     for (const element of elementsArray) {
@@ -228,26 +104,24 @@ export default function GraphView({ refresh, viewType }) {
     }
 
     return uniqueElements
-  })()
+  }, [graph.adjacency_list])
 
-  const layout = {
-    name: elements.length > 0 ? "cose" : "grid",
-    idealEdgeLength: 100,
-    nodeOverlap: 20,
-    refresh: 20,
+  // Use a very simple layout to avoid the complexity of cose
+  const layout = useMemo(() => ({
+    name: "preset", // Use preset instead of cose for reliability
     fit: true,
-    padding: 30,
-    randomize: false,
-    componentSpacing: 100,
-    nodeRepulsion: 400000,
-    edgeElasticity: 100,
-    nestingFactor: 5,
-    gravity: 80,
-    numIter: 1000,
-    initialTemp: 200,
-    coolingFactor: 0.95,
-    minTemp: 1.0,
-  }
+    padding: 50,
+    animate: false,
+    positions: function(node) {
+      // Generate random positions in a circle
+      const radius = 200;
+      const angle = Math.random() * 2 * Math.PI;
+      return {
+        x: 250 + radius * Math.cos(angle),
+        y: 250 + radius * Math.sin(angle)
+      };
+    }
+  }), [])
 
   if (loading) {
     return (
@@ -257,7 +131,7 @@ export default function GraphView({ refresh, viewType }) {
     )
   }
 
-  const hasData = Object.keys(graph.adjacency_list).length > 0
+  const hasData = Object.keys(graph.adjacency_list || {}).length > 0
 
   if (!hasData) {
     return (
@@ -269,8 +143,17 @@ export default function GraphView({ refresh, viewType }) {
   }
 
   if (viewType === "visual") {
+    // If there are no elements, don't try to render the graph
+    if (elements.length === 0) {
+      return (
+        <div className="p-8 text-center">
+          <p className="text-gray-500">No valid connections found in your knowledge graph.</p>
+        </div>
+      )
+    }
+    
     return (
-      <div className="h-[500px] w-full">
+      <div className="h-[500px] w-full" key={forceUpdate}>
         <CytoscapeComponent
           elements={elements}
           style={{ width: "100%", height: "100%" }}
@@ -285,12 +168,12 @@ export default function GraphView({ refresh, viewType }) {
                 "text-valign": "center",
                 "text-halign": "center",
                 "font-size": "12px",
-                width: "mapData(connections, 0, 10, 30, 60)",
-                height: "mapData(connections, 0, 10, 30, 60)",
+                width: 40,
+                height: 40,
                 "border-width": 2,
                 "border-color": "#6d28d9",
                 "text-outline-width": 2,
-                "text-outline-color": "#7c3aed",
+                "text-outline-color": "#7c3aed"
               },
             },
             {
@@ -323,40 +206,57 @@ export default function GraphView({ refresh, viewType }) {
             },
           ]}
           cy={(cy) => {
-            cyRef.current = cy
+            try {
+              // Prevent multiple initialization
+              if (!cyRef.current) {
+                cyRef.current = cy
+                
+                // Safe removal of previous event handlers
+                cy.removeAllListeners()
+                
+                // Handle node interactions
+                cy.on("tap", "node", (evt) => {
+                  const node = evt.target
+                  console.log("Tapped node:", node.id())
+                })
 
-            cy.on("tap", "node", (evt) => {
-              const node = evt.target
-              console.log("Tapped node:", node.id())
-            })
+                cy.on("mouseover", "node", () => {
+                  document.body.style.cursor = "pointer"
+                })
 
-            cy.on("mouseover", "node", () => {
-              document.body.style.cursor = "pointer"
-            })
-
-            cy.on("mouseout", "node", () => {
-              document.body.style.cursor = "default"
-            })
+                cy.on("mouseout", "node", () => {
+                  document.body.style.cursor = "default"
+                })
+                
+                setCyReady(true)
+              }
+            } catch (err) {
+              console.error("Error setting up Cytoscape:", err)
+              // Force a re-render if there's an initialization error
+              if (mountedRef.current) {
+                setTimeout(() => setForceUpdate(prev => prev + 1), 100)
+              }
+            }
           }}
         />
       </div>
     )
   } else {
     return (
-      <div className="h-[500px] overflow-y-auto p-6 ">
+      <div className="h-[500px] overflow-y-auto p-6">
         <ul className="space-y-5">
-          {Object.entries(graph.adjacency_list).map(([title, links]) => (
-            <li key={title} className="p-3 bg-gray-100  rounded-lg">
+          {Object.entries(graph.adjacency_list || {}).map(([title, links]) => (
+            <li key={title} className="p-3 bg-gray-100 rounded-lg">
               <div className="flex items-center gap-2 font-medium text-blue-600">
                 <span>{title}</span>
                 <span className="text-gray-400">--→</span>
               </div>
-              {links.length > 0 ? (
+              {Array.isArray(links) && links.length > 0 ? (
                 <div className="mt-2 pl-4 flex flex-wrap gap-2">
                   {links.map((link, index) => (
                     <span
-                      key={index}
-                      className="text-sm px-2 py-1 border border-gray-300  rounded-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                      key={`${title}-${link}-${index}`}
+                      className="text-sm px-2 py-1 border border-gray-300 rounded-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                     >
                       {link}
                     </span>
