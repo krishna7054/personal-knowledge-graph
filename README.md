@@ -13,6 +13,7 @@ https://personal-knowledge-graph.vercel.app
   - Windows Setup Using Batch Scripts
   - Manual Setup
 - Running the Application
+- Testing
 - Usage
 
 
@@ -224,6 +225,42 @@ Expected notes/graph/ response:
 }
 ```
 
+## Testing
+The backend includes automated tests to verify API functionality, located in backend/app/tests/test_notes.py. The tests use pytest and cover creating notes, linking notes, and retrieving the graph structure.
+
+### Running Tests
+1. Activate Virtual Environment:
+```bash
+cd backend
+\venv\Scripts\activate
+pip install pytest
+```
+2. Run Tests:
+```bash
+pytest 
+```
+- This runs all tests in app/tests/test_notes.py and other test files.
+```bash
+Expected output (for 14 tests):
+
+=================== test session starts ===================
+platform win32 -- Python 3.10.6, pytest-8.3.5, pluggy-1.6.0
+rootdir: D:\personal-knowledge-graph\backend
+collected 14 items
+
+app/tests/test_notes.py::test_create_note PASSED [  7%]
+app/tests/test_notes.py::test_create_link PASSED [ 14%]
+app/tests/test_notes.py::test_get_graph PASSED [ 21%]
+...
+================== 17 passed in 0.50s ==================
+```
+3. Test File Overview:
+- Location: backend/app/tests/test_notes.py
+- Purpose: Tests the core API endpoints:
+  - POST /notes/: Creates a note with title, content, and tags.
+  - PATCH /notes/{id}/link: Links two notes.
+  - GET /notes/graph/: Retrieves the graph as an adjacency list.
+  - Setup: Uses an in-memory SQLite database (test.db) and FastAPI’s TestClient for isolated testing.
 
 ## Usage
 
