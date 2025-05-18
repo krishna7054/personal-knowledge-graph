@@ -80,7 +80,7 @@ export default function NoteList({ onSelectNote, refresh }) {
         if (tag) params.tag = tag
         if (keyword) params.keyword = keyword
 
-        const response = await axios.get("http://localhost:8000/notes/", { params })
+        const response = await axios.get("https://personal-knowledge-graph-production.up.railway.app/notes/", { params })
         setNotes(response.data)
       } catch (error) {
         console.error("Error fetching notes:", error)
@@ -154,7 +154,7 @@ export default function NoteList({ onSelectNote, refresh }) {
             )}
           </div>
         ) : (
-          <ul className="divide-y divide-gray-200 h-96  overflow-y-auto ">
+          <ul className="divide-y divide-gray-200 h-80  overflow-y-auto ">
             {notes.map((note) => (
               <li
                 key={note.id}

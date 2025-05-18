@@ -103,7 +103,7 @@ export default function NoteForm({ onNoteCreated }) {
     setIsSubmitting(true)
 
     try {
-      await axios.post("http://localhost:8000/notes/", {
+      await axios.post("https://personal-knowledge-graph-production.up.railway.app/notes/", {
         title,
         content,
         tags: tags

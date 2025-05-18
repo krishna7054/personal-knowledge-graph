@@ -105,7 +105,7 @@ export default function Home() {
                   onClick={() => setActiveTab("visual")}
                   className={`px-4 py-2 text-sm font-medium rounded-md border ${
                     activeTab === "visual"
-                      ? "bg-primary text-white border-primary"
+                      ? "bg-purple-600 text-white border-purple-600"
                       : "bg-white  text-gray-700  border-gray-300 "
                   }`}
                 >
@@ -115,7 +115,7 @@ export default function Home() {
                   onClick={() => setActiveTab("text")}
                   className={`px-4 py-2 text-sm font-medium rounded-md border ${
                     activeTab === "text"
-                      ? "bg-primary text-white border-primary"
+                      ? "bg-purple-600 text-white border-purple-600"
                       : "bg-white  text-gray-700  border-gray-300 "
                   }`}
                 >
