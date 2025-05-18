@@ -154,26 +154,28 @@ export default function NoteList({ onSelectNote, refresh }) {
             )}
           </div>
         ) : (
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-gray-200 h-96  overflow-y-auto ">
             {notes.map((note) => (
               <li
                 key={note.id}
                 onClick={() => handleNoteSelect(note.id)}
-                className={`p-4 cursor-pointer transition-colors ${
+                className={`p-5 cursor-pointer transition-colors  ${
                   selectedNoteId === note.id
                     ? "bg-blue-100"
                     : "hover:bg-gray-100"
                 }`}
               >
-                <h3 className="font-semibold text-gray-800 mb-1">{note.title}</h3>
+                <h3 className="font-semibold text-gray-600 mb-1 "><span className="text-green-600">Title:</span> {note.title}</h3>
                 {note.tags && note.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
+                  <div className="flex flex-wrap gap-1 mt-2 ">
+                    <span className="text-green-600 ">Tag:</span>
                     {note.tags.map((tag, idx) => (
+
                       <span
                         key={idx}
-                        className="bg-gray-200 text-gray-700 px-3 py-1 text-md rounded-full"
+                        className="bg-yellow-100 text-gray-800 px-2 py-1 text-md rounded-full "
                       >
-                        {tag.name}
+                         {tag.name}
                       </span>
                     ))}
                   </div>
