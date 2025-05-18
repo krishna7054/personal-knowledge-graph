@@ -1,61 +1,188 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
 
-const NoteList = ({ onSelectNote, refresh }) => {
-  const [notes, setNotes] = useState([]);
-  const [tag, setTag] = useState('');
-  const [keyword, setKeyword] = useState('');
+// const NoteList = ({ onSelectNote, refresh }) => {
+//   const [notes, setNotes] = useState([]);
+//   const [tag, setTag] = useState('');
+//   const [keyword, setKeyword] = useState('');
+
+//   useEffect(() => {
+//     const fetchNotes = async () => {
+//       try {
+//         const params = {};
+//         if (tag) params.tag = tag;
+//         if (keyword) params.keyword = keyword;
+//         const response = await axios.get('http://localhost:8000/notes/', { params });
+//         setNotes(response.data);
+//       } catch (error) {
+//         console.error('Error fetching notes:', error);
+//       }
+//     };
+//     fetchNotes();
+//   }, [tag, keyword, refresh]);
+
+//   return (
+//     <div className="mb-4">
+//       <div className="mb-2 flex space-x-2">
+//         <input
+//           type="text"
+//           value={tag}
+//           onChange={(e) => setTag(e.target.value)}
+//           placeholder="Filter by tag (e.g., productivity)"
+//           className="border p-2 flex-1"
+//         />
+//         <input
+//           type="text"
+//           value={keyword}
+//           onChange={(e) => setKeyword(e.target.value)}
+//           placeholder="Search by keyword"
+//           className="border p-2 flex-1"
+//         />
+//       </div>
+//       <ul className="border rounded">
+//         {notes.length === 0 ? (
+//           <li className="p-2 text-gray-500">No notes found</li>
+//         ) : (
+//           notes.map((note) => (
+//             <li
+//               key={note.id}
+//               onClick={() => onSelectNote(note.id)}
+//               className="cursor-pointer p-2 hover:bg-gray-100"
+//             >
+//               {note.title}
+//             </li>
+//           ))
+//         )}
+//       </ul>
+//     </div>
+//   );
+// };
+
+// export default NoteList;
+
+
+import { useState, useEffect } from "react"
+import axios from "axios"
+import { Search, Tag, Loader2 } from "lucide-react"
+
+export default function NoteList({ onSelectNote, refresh }) {
+  const [notes, setNotes] = useState([])
+  const [tag, setTag] = useState("")
+  const [keyword, setKeyword] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [selectedNoteId, setSelectedNoteId] = useState(null)
 
   useEffect(() => {
     const fetchNotes = async () => {
+      setLoading(true)
       try {
-        const params = {};
-        if (tag) params.tag = tag;
-        if (keyword) params.keyword = keyword;
-        const response = await axios.get('http://localhost:8000/notes/', { params });
-        setNotes(response.data);
+        const params = {}
+        if (tag) params.tag = tag
+        if (keyword) params.keyword = keyword
+
+        const response = await axios.get("http://localhost:8000/notes/", { params })
+        setNotes(response.data)
       } catch (error) {
-        console.error('Error fetching notes:', error);
+        console.error("Error fetching notes:", error)
+      } finally {
+        setLoading(false)
       }
-    };
-    fetchNotes();
-  }, [tag, keyword, refresh]);
+    }
+
+    fetchNotes()
+  }, [tag, keyword, refresh])
+
+  const handleNoteSelect = (noteId) => {
+    setSelectedNoteId(noteId)
+    onSelectNote(noteId)
+  }
+
+  const handleClearFilters = () => {
+    setTag("")
+    setKeyword("")
+  }
 
   return (
-    <div className="mb-4">
-      <div className="mb-2 flex space-x-2">
-        <input
-          type="text"
-          value={tag}
-          onChange={(e) => setTag(e.target.value)}
-          placeholder="Filter by tag (e.g., productivity)"
-          className="border p-2 flex-1"
-        />
-        <input
-          type="text"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          placeholder="Search by keyword"
-          className="border p-2 flex-1"
-        />
-      </div>
-      <ul className="border rounded">
-        {notes.length === 0 ? (
-          <li className="p-2 text-gray-500">No notes found</li>
-        ) : (
-          notes.map((note) => (
-            <li
-              key={note.id}
-              onClick={() => onSelectNote(note.id)}
-              className="cursor-pointer p-2 hover:bg-gray-100"
-            >
-              {note.title}
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
-  );
-};
+    <div className="flex flex-col h-full">
+      {/* Filters */}
+      <div className="p-4 space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="Search notes..."
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-export default NoteList;
+        <div className="relative">
+          <Tag className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
+          <input
+            type="text"
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            placeholder="Filter by tag..."
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {(tag || keyword) && (
+          <div className="flex justify-end">
+            <button
+              onClick={handleClearFilters}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Notes List */}
+      <div className="flex-1 overflow-y-auto border-t border-gray-200">
+        {loading ? (
+          <div className="flex items-center justify-center p-8">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+          </div>
+        ) : notes.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <p>No notes found</p>
+            {(tag || keyword) && (
+              <p className="mt-2 text-sm">Try adjusting your filters</p>
+            )}
+          </div>
+        ) : (
+          <ul className="divide-y divide-gray-200">
+            {notes.map((note) => (
+              <li
+                key={note.id}
+                onClick={() => handleNoteSelect(note.id)}
+                className={`p-4 cursor-pointer transition-colors ${
+                  selectedNoteId === note.id
+                    ? "bg-blue-100"
+                    : "hover:bg-gray-100"
+                }`}
+              >
+                <h3 className="font-semibold text-gray-800 mb-1">{note.title}</h3>
+                {note.tags && note.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {note.tags.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-gray-200 text-gray-700 px-3 py-1 text-md rounded-full"
+                      >
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}
